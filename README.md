@@ -421,11 +421,5 @@ All API responses follow a consistent format:
 - **Transaction Management**: Service layer with @Transactional annotations
 - **Validation**: Input validation using Jakarta Bean Validation annotations
 
-## License
 
-This project is proprietary and confidential.
-
-## Support
-
-For issues or questions, please contact the development team.
 
