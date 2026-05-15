@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "doctors")
 @Getter
@@ -35,5 +38,8 @@ public class Doctor extends BaseEntity {
 
     @Column(nullable = false)
     private Integer yearsOfExperience;
+
+    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL)
+    private List<Appointment> appointments = new ArrayList<>();
 }
 

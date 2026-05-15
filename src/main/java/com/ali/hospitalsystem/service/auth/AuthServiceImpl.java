@@ -7,6 +7,8 @@ import com.ali.hospitalsystem.entity.User;
 import com.ali.hospitalsystem.repository.UserRepository;
 import com.ali.hospitalsystem.security.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import com.myapp.exceptions.ConflictException;
+import com.myapp.exceptions.ResourceNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,10 +29,10 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthResponseDto register(RegisterRequestDto dto) {
         if (userRepository.existsByUsername(dto.getUsername())) {
-            throw new IllegalArgumentException("Username already exists");
+            throw new ConflictException("Username already exists");
         }
         if (userRepository.existsByEmail(dto.getEmail())) {
-            throw new IllegalArgumentException("Email already exists");
+            throw new ConflictException("Email already exists");
         }
 
         User user = User.builder()
@@ -66,7 +68,7 @@ public class AuthServiceImpl implements AuthService {
         String token = jwtUtil.generateToken(userDetails);
 
         User user = userRepository.findByUsername(dto.getUsername())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         return AuthResponseDto.builder()
                 .token(token)

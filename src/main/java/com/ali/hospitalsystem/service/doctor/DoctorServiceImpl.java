@@ -6,6 +6,8 @@ import com.ali.hospitalsystem.entity.Doctor;
 import com.ali.hospitalsystem.mapper.DoctorMapper;
 import com.ali.hospitalsystem.repository.DoctorRepository;
 import lombok.RequiredArgsConstructor;
+import com.myapp.exceptions.ConflictException;
+import com.myapp.exceptions.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,10 +24,10 @@ public class DoctorServiceImpl implements DoctorService {
     @Override
     public DoctorResponseDto createDoctor(DoctorRequestDto dto) {
         if (doctorRepository.existsByEmail(dto.getEmail())) {
-            throw new IllegalArgumentException("Email already exists");
+            throw new ConflictException("Email already exists");
         }
         if (doctorRepository.existsByLicenseNumber(dto.getLicenseNumber())) {
-            throw new IllegalArgumentException("License number already exists");
+            throw new ConflictException("License number already exists");
         }
         Doctor doctor = doctorMapper.toEntity(dto);
         Doctor savedDoctor = doctorRepository.save(doctor);
@@ -36,7 +38,7 @@ public class DoctorServiceImpl implements DoctorService {
     @Transactional(readOnly = true)
     public DoctorResponseDto getDoctorById(Long id) {
         Doctor doctor = doctorRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Doctor not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found with id: " + id));
         return doctorMapper.toDto(doctor);
     }
 
@@ -52,13 +54,13 @@ public class DoctorServiceImpl implements DoctorService {
     @Override
     public DoctorResponseDto updateDoctor(Long id, DoctorRequestDto dto) {
         Doctor doctor = doctorRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Doctor not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found with id: " + id));
 
-        if (!doctor.getEmail().equals(dto.getEmail()) && doctorRepository.existsByEmail(dto.getEmail())) {
-            throw new IllegalArgumentException("Email already exists");
+            if (!doctor.getEmail().equals(dto.getEmail()) && doctorRepository.existsByEmail(dto.getEmail())) {
+            throw new ConflictException("Email already exists");
         }
         if (!doctor.getLicenseNumber().equals(dto.getLicenseNumber()) && doctorRepository.existsByLicenseNumber(dto.getLicenseNumber())) {
-            throw new IllegalArgumentException("License number already exists");
+            throw new ConflictException("License number already exists");
         }
 
         doctor.setFirstName(dto.getFirstName());
@@ -76,7 +78,7 @@ public class DoctorServiceImpl implements DoctorService {
     @Override
     public void deleteDoctor(Long id) {
         if (!doctorRepository.existsById(id)) {
-            throw new IllegalArgumentException("Doctor not found with id: " + id);
+            throw new ResourceNotFoundException("Doctor not found with id: " + id);
         }
         doctorRepository.deleteById(id);
     }

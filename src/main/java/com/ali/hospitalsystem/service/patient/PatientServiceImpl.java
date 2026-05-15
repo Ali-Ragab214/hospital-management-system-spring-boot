@@ -6,6 +6,8 @@ import com.ali.hospitalsystem.entity.Patient;
 import com.ali.hospitalsystem.mapper.PatientMapper;
 import com.ali.hospitalsystem.repository.PatientRepository;
 import lombok.RequiredArgsConstructor;
+import com.myapp.exceptions.ConflictException;
+import com.myapp.exceptions.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +24,7 @@ public class PatientServiceImpl implements PatientService {
     @Override
     public PatientResponseDto createPatient(PatientRequestDto dto) {
         if (patientRepository.existsByEmail(dto.getEmail())) {
-            throw new IllegalArgumentException("Email already exists");
+            throw new ConflictException("Email already exists");
         }
         Patient patient = patientMapper.toEntity(dto);
         Patient savedPatient = patientRepository.save(patient);
@@ -33,7 +35,7 @@ public class PatientServiceImpl implements PatientService {
     @Transactional(readOnly = true)
     public PatientResponseDto getPatientById(Long id) {
         Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Patient not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Patient not found with id: " + id));
         return patientMapper.toDto(patient);
     }
 
@@ -49,10 +51,10 @@ public class PatientServiceImpl implements PatientService {
     @Override
     public PatientResponseDto updatePatient(Long id, PatientRequestDto dto) {
         Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Patient not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Patient not found with id: " + id));
 
         if (!patient.getEmail().equals(dto.getEmail()) && patientRepository.existsByEmail(dto.getEmail())) {
-            throw new IllegalArgumentException("Email already exists");
+            throw new ConflictException("Email already exists");
         }
 
         patient.setFirstName(dto.getFirstName());
@@ -71,7 +73,7 @@ public class PatientServiceImpl implements PatientService {
     @Override
     public void deletePatient(Long id) {
         if (!patientRepository.existsById(id)) {
-            throw new IllegalArgumentException("Patient not found with id: " + id);
+            throw new ResourceNotFoundException("Patient not found with id: " + id);
         }
         patientRepository.deleteById(id);
     }

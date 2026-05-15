@@ -8,6 +8,8 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "patients")
@@ -42,5 +44,8 @@ public class Patient extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private BloodType bloodType;
+
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+    private List<Appointment> appointments = new ArrayList<>();
 }
 

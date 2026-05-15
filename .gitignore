@@ -38,4 +38,6 @@ TESTING.md
 README.md
 ARCHITECTURE.md
 
-
+# Ignore all Markdown files (both lowercase and uppercase extensions)
+*.md
+*.MD

@@ -9,6 +9,7 @@ import com.ali.hospitalsystem.repository.AppointmentRepository;
 import com.ali.hospitalsystem.repository.DoctorRepository;
 import com.ali.hospitalsystem.repository.PatientRepository;
 import lombok.RequiredArgsConstructor;
+import com.myapp.exceptions.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,9 +28,9 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public AppointmentResponseDto createAppointment(AppointmentRequestDto dto) {
         var patient = patientRepository.findById(dto.getPatientId())
-                .orElseThrow(() -> new IllegalArgumentException("Patient not found with id: " + dto.getPatientId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Patient not found with id: " + dto.getPatientId()));
         var doctor = doctorRepository.findById(dto.getDoctorId())
-                .orElseThrow(() -> new IllegalArgumentException("Doctor not found with id: " + dto.getDoctorId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found with id: " + dto.getDoctorId()));
 
         Appointment appointment = Appointment.builder()
                 .patient(patient)
@@ -47,7 +48,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Transactional(readOnly = true)
     public AppointmentResponseDto getAppointmentById(Long id) {
         Appointment appointment = appointmentRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Appointment not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with id: " + id));
         return appointmentMapper.toDto(appointment);
     }
 
@@ -72,12 +73,12 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public AppointmentResponseDto updateAppointment(Long id, AppointmentRequestDto dto) {
         Appointment appointment = appointmentRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Appointment not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with id: " + id));
 
         var patient = patientRepository.findById(dto.getPatientId())
-                .orElseThrow(() -> new IllegalArgumentException("Patient not found with id: " + dto.getPatientId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Patient not found with id: " + dto.getPatientId()));
         var doctor = doctorRepository.findById(dto.getDoctorId())
-                .orElseThrow(() -> new IllegalArgumentException("Doctor not found with id: " + dto.getDoctorId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found with id: " + dto.getDoctorId()));
 
         appointment.setPatient(patient);
         appointment.setDoctor(doctor);
@@ -92,7 +93,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public void deleteAppointment(Long id) {
         if (!appointmentRepository.existsById(id)) {
-            throw new IllegalArgumentException("Appointment not found with id: " + id);
+            throw new ResourceNotFoundException("Appointment not found with id: " + id);
         }
         appointmentRepository.deleteById(id);
     }
